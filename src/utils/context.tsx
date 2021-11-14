@@ -18,6 +18,7 @@ interface TodoInterface {
   length: () => number;
   triggerItem: (id: string) => void;
   triggerAll: () => void;
+  deleteDone: () => void;
 }
 
 const TodoContext = createContext<TodoInterface | undefined>(undefined);
@@ -82,6 +83,9 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const deleteDone = () => {
+    setTodoList(todoList.filter((item) => item.complete === false));
+  };
   return (
     <TodoContext.Provider
       children={children}
@@ -94,6 +98,7 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
         filter,
         triggerItem,
         triggerAll,
+        deleteDone,
       }}
     ></TodoContext.Provider>
   );

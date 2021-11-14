@@ -5,10 +5,22 @@ import TodoCount from "./TodoCount";
 
 export default function Footer() {
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+      }}
+    >
       <TodoCount />
-      <FilterList />
-      <ClearButton />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <FilterList />
+        <ClearButton />
+      </div>
     </div>
   );
 }
