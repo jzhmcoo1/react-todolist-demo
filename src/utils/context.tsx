@@ -1,20 +1,23 @@
-import React, { createContext, ReactNode, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { TodoItem } from "../typings/todo-item";
 
-enum Type {
-  active = "Active",
-  complete = "Compeleted",
-  all = "All",
-}
+import { Type } from "./constant";
 
 interface TodoInterface {
+  allDone: boolean;
   todoList: TodoItem[];
+  filter: (flag: Type) => void;
   addItem: (item: TodoItem) => void;
-  deleteItem: (id: string) => void;
+  deleteItemById: (id: string) => void;
   length: () => number;
-  filter: (flag: Type) => TodoItem[];
-  done: (id: string) => void;
-  doneAll: () => void;
+  triggerItem: (id: string) => void;
+  triggerAll: () => void;
 }
 
 const TodoContext = createContext<TodoInterface | undefined>(undefined);
@@ -23,13 +26,33 @@ TodoContext.displayName = "TodoContext";
 
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
   const [todoList, setTodoList] = useState<TodoItem[]>([]);
+  const [showState, setShowState] = useState<Type>(Type.ALL);
+  const [allDone, setAllDown] = useState(false);
+
+  const filterList: TodoItem[] = useMemo(() => {
+    switch (showState) {
+      case Type.ACTIVE:
+        return todoList.filter((item) => item.complete === false);
+      case Type.COMPLETED:
+        return todoList.filter((item) => item.complete === true);
+      default:
+        return todoList;
+    }
+  }, [showState, todoList]);
+
+  useEffect(() => {
+    setAllDown(
+      todoList.length !== 0 && todoList.every((item) => item.complete === true)
+    );
+  }, [todoList]);
 
   const addItem = (item: TodoItem) => {
     console.log("增加了", item);
     setTodoList([...todoList, item]);
   };
 
-  const deleteItem = (id: string) => {
+  const deleteItemById = (id: string) => {
+    console.log("删除了", id);
     setTodoList(todoList.filter((item) => item.id !== id));
   };
 
@@ -38,28 +61,22 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const filter = (flag: Type) => {
-    switch (flag) {
-      case "Active":
-        return todoList.filter((item) => item.complete === false);
-      case "Compeleted":
-        return todoList.filter((item) => item.complete === true);
-      default:
-        return todoList;
-    }
+    setShowState(flag);
   };
 
-  const done = (id: string) => {
-    const item = todoList.find((item) => item.id === id);
+  const triggerItem = (id: string) => {
+    const copy = [...todoList];
+    const item = copy.find((item) => item.id === id);
     if (item) {
-      item.complete = true;
+      item.complete = !item.complete;
     }
-    setTodoList(todoList);
+    setTodoList(copy);
   };
 
-  const doneAll = () => {
+  const triggerAll = () => {
     setTodoList(
       todoList.map((item) => {
-        item.complete = true;
+        item.complete = allDone ? false : true;
         return item;
       })
     );
@@ -68,7 +85,16 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
   return (
     <TodoContext.Provider
       children={children}
-      value={{ todoList, addItem, deleteItem, length, filter, done, doneAll }}
+      value={{
+        allDone,
+        todoList: filterList,
+        addItem,
+        deleteItemById,
+        length,
+        filter,
+        triggerItem,
+        triggerAll,
+      }}
     ></TodoContext.Provider>
   );
 };
