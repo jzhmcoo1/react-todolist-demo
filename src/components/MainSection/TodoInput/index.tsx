@@ -3,7 +3,10 @@ import { Input, Button } from "antd";
 import { CheckOutlined } from "@ant-design/icons";
 import { useTodo } from "../../../utils/context";
 import { nanoid } from "nanoid";
-import moment from "moment";
+import dayjs from "dayjs";
+import "dayjs/locale/zh-cn";
+dayjs.locale("zh-cn"); // 使用本地化语言
+
 export default function TodoInput() {
   const [state, setState] = useState("");
 
@@ -24,7 +27,7 @@ export default function TodoInput() {
               id: nanoid(),
               text: state,
               complete: false,
-              time: moment(),
+              time: dayjs(),
             });
             setState("");
           }

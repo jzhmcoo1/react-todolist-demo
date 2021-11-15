@@ -2,6 +2,10 @@ import React from "react";
 import { List, Button, Typography } from "antd";
 import { DeleteOutlined, CheckOutlined } from "@ant-design/icons";
 import { useTodo } from "../../../utils/context";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.locale("zh-CN");
+dayjs.extend(relativeTime);
 
 const { Text } = Typography;
 
